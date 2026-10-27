@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#14161a">
+<title>NANNI GYM</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root{--bg:#14161a;--card:#1f2228;--line:#2c3038;--txt:#f2f3f5;--mut:#8b919c;--acc:#3ddc97;--red:#ff6b6b}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:-apple-system,system-ui,"Segoe UI",Roboto,sans-serif}
+  body{display:flex;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+  header{padding:14px 20px 10px;border-bottom:1px solid var(--line)}
+  .bar{display:flex;gap:8px;align-items:center}
+  #foglio{flex:1;min-width:0;font-size:18px;font-weight:700;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt)}
+  .sm{padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:14px;white-space:nowrap}
+  .sm:active{background:var(--line)}
+  .lbl{font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;margin-top:14px}
+  #tot{font-size:clamp(30px,11vw,48px);white-space:nowrap;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1;margin-top:4px;color:var(--acc)}
+  #cnt{font-size:14px;color:var(--mut);margin-top:2px}
+  main{flex:1;overflow-y:auto;padding:0 20px}
+  ul{list-style:none;margin:0;padding:0}
+  li{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+  li .info{flex:1;min-width:0}
+  li .nm{font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  li .dt{font-size:13px;color:var(--mut);margin-top:2px}
+  li .eur{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+  li button{background:none;border:0;color:var(--mut);font-size:20px;width:34px;height:34px;border-radius:8px}
+  li button:active{background:var(--line)}
+  .empty{color:var(--mut);text-align:center;padding:40px 0;font-size:15px;display:block;border:0}
+  footer{padding:12px 16px 14px;border-top:1px solid var(--line)}
+  form{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  input{width:100%;min-width:0;font-size:17px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);outline:none;font-family:inherit}
+  input:focus{border-color:var(--acc)}
+  input.err{border-color:var(--red)}
+  #nome{grid-column:1 / -1}
+  .add{grid-column:1 / -1;font-size:17px;font-weight:700;padding:13px;border:0;border-radius:12px;background:var(--acc);color:#0b2a1d}
+  .row{display:flex;gap:8px;margin-top:8px}
+  .row button{flex:1;padding:11px 6px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:14px}
+  .row button:active{background:var(--line)}
+  .row button.danger{color:var(--red);border-color:#5a2a2e}
+  .ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);align-items:center;justify-content:center;padding:24px;z-index:9}
+  .ov.on{display:flex}
+  .ov>div{background:var(--card);border-radius:16px;padding:22px;width:100%;max-width:340px}
+  .ov p{margin:0 0 6px;font-size:18px;font-weight:600;text-align:center}
+  .ov small{display:block;color:var(--mut);text-align:center;margin-bottom:16px;font-size:14px}
+  .ov input{margin-bottom:6px;background:var(--bg)}
+  .ov .ok{background:var(--acc);border-color:var(--acc);color:#0b2a1d;font-weight:700}
+  .ov .yes{background:var(--red);border-color:var(--red);color:#fff;font-weight:700}
+  #titolo{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:22px;font-weight:800;background:none;border:0;color:var(--txt);padding:0;max-width:100%;text-align:left}
+  #titolo span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #titolo i{font-style:normal;color:var(--mut);font-size:16px}
+  .hrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px}
+  .hrow #titolo{margin:0;min-width:0}
+  #guidaBtn{flex-shrink:0;padding:8px 12px;border-radius:20px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:14px}
+  #guidaBtn.on{background:var(--acc);border-color:var(--acc);color:#0b2a1d}
+  #guida{display:none;max-height:62vh;overflow-y:auto;margin:0 0 12px;padding:4px 14px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;font-size:15px;line-height:1.5}
+  #guida.on{display:block}
+  #guida h4{margin:12px 0 6px;font-size:16px}
+  #guida details{border-bottom:1px solid var(--line);padding:10px 0}
+  #guida details:last-of-type{border-bottom:0}
+  #guida summary{font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+  #guida summary::-webkit-details-marker{display:none}
+  #guida summary::after{content:'▾';color:var(--mut)}
+  #guida details[open] summary::after{content:'▴'}
+  #guida ol{margin:8px 0 0;padding-left:20px}
+  #guida li{display:list-item;border:0;padding:3px 0}
+  #guida b{color:var(--acc)}
+  #guida .nota{color:var(--mut);font-size:14px;margin-top:8px}
+  #elTutto{width:100%;margin-top:10px;padding:12px;border-radius:12px;border:0;background:var(--red);color:#fff;font-size:15px;font-weight:700}
+  .tabs{display:flex;gap:6px;margin-bottom:12px}
+  .tabs button{flex:1;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--mut);font-size:15px;font-weight:600}
+  .tabs button.on{background:var(--acc);border-color:var(--acc);color:#0b2a1d}
+  #arch{display:none;flex:1;overflow-y:auto;padding:0 20px 20px}
+  body.ar #arch{display:block}
+  body.ar main,body.ar footer,body.ar #head-foglio{display:none}
+  .gt{background:var(--card);border-radius:14px;padding:14px 16px;margin:14px 0 6px}
+  .gt .v{font-size:32px;font-weight:700;color:var(--acc);font-variant-numeric:tabular-nums}
+  .sec{margin-top:18px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .sec h3{margin:0;padding:12px 14px;background:var(--card);display:flex;justify-content:space-between;align-items:center;font-size:17px}
+  .sec h3 span{color:var(--acc);font-variant-numeric:tabular-nums}
+  .sec ul{padding:0 14px}
+  .sec li:last-child{border-bottom:0}
+  .sec .apri{display:block;width:100%;padding:10px;background:none;border:0;border-top:1px solid var(--line);color:var(--acc);font-size:14px}
+  #toast{position:fixed;left:50%;bottom:190px;transform:translateX(-50%);background:var(--acc);color:#0b2a1d;padding:10px 16px;border-radius:20px;font-size:14px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none}
+  #toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow"><button id="titolo" type="button"><span id="titoloT"></span><i>✎</i></button><button id="guidaBtn" type="button">ⓘ Come eliminare ▾</button></div>
+  <div id="guida">
+    <h4>Come eliminare i dati</h4>
+    <div class="nota" style="margin-top:0">I dati non sono dentro il file e non vanno su internet: sono salvati solo nella memoria di Chrome di questo telefono. Quando li elimini da qui, li cancelli anche da Chrome.</div>
+    <details><summary>Fine mese: eliminare un foglio (es. NOVEMBRE)</summary>
+      <ol>
+        <li>Se vuoi tenerne traccia, apri il foglio e premi <b>Copia</b>, poi incolla l'elenco dove vuoi (es. una nota).</li>
+        <li>Vai su <b>Foglio</b> e scegli il mese dalla tendina (es. NOVEMBRE).</li>
+        <li>Premi <b>Elimina foglio</b> in basso e conferma.</li>
+      </ol>
+      <div class="nota">Il foglio sparisce dall'app e dalla memoria di Chrome. Gli altri mesi restano. Ripeti così ogni mese.</div>
+    </details>
+    <details><summary>Eliminare tutti i fogli in un colpo</summary>
+      <ol><li>Premi il pulsante qui sotto e conferma.</li></ol>
+      <div class="nota">Cancella tutti i fogli, tutti i pagamenti e il nome dell'app dalla memoria di Chrome. L'app riparte vuota.</div>
+      <button id="elTutto" type="button">Elimina tutto da questo telefono</button>
+    </details>
+    <details><summary>Eliminare anche l'app</summary>
+      <ol>
+        <li><b>Prima</b> premi "Elimina tutto da questo telefono" (sezione sopra).</li>
+        <li>Tieni premuta l'icona dell'app sulla schermata Home e scegli <b>Disinstalla</b> (o Rimuovi).</li>
+      </ol>
+      <div class="nota">Se disinstalli senza svuotare prima, i dati potrebbero restare nascosti in Chrome: in quel caso segui la sezione qui sotto.</div>
+    </details>
+    <details><summary>Pulizia completa da Chrome</summary>
+      <ol>
+        <li>Apri <b>Chrome</b> e tocca <b>⋮</b> in alto a destra.</li>
+        <li>Vai su <b>Impostazioni › Impostazioni sito › Tutti i siti</b>.</li>
+        <li>Cerca l'indirizzo di questa app (finisce con <b>github.io</b>) e toccalo.</li>
+        <li>Premi <b>Elimina</b> (o "Cancella e reimposta") e conferma.</li>
+      </ol>
+      <div class="nota">Cancella solo i dati di questa app: non ti disconnette dagli altri siti.</div>
+    </details>
+  </div>
+  <div class="tabs"><button id="tF" class="on" type="button">Foglio</button><button id="tA" type="button">Archivio</button></div>
+  <div id="head-foglio">
+  <div class="bar">
+    <select id="foglio" aria-label="Foglio"></select>
+    <button class="sm" id="nuovo" type="button">＋ Nuovo</button>
+    <button class="sm" id="rin" type="button" aria-label="Rinomina">✎</button>
+  </div>
+  <div class="lbl">Totale ricevuto</div>
+  <div id="tot">€ 0,00</div>
+  <div id="cnt"></div>
+  </div>
+</header>
+<section id="arch"></section>
+<main><ul id="list"></ul></main>
+<footer>
+  <form id="f">
+    <input id="nome" type="text" placeholder="Nome e cognome" autocomplete="off" autocapitalize="words">
+    <input id="data" type="date" aria-label="Scadenza">
+    <input id="imp" type="text" inputmode="decimal" placeholder="Importo €" autocomplete="off">
+    <button class="add" type="submit">Aggiungi</button>
+  </form>
+  <div class="row">
+    <button id="copy" type="button">Copia</button>
+    <button id="svuota" type="button" class="danger">Svuota foglio</button>
+    <button id="delf" type="button" class="danger">Elimina foglio</button>
+  </div>
+</footer>
+
+<div class="ov" id="dlgNome"><div>
+  <p id="dlgNomeT">Nuovo foglio</p><small>Es. NOVEMBRE</small>
+  <input id="dlgNomeIn" type="text" autocapitalize="characters" autocomplete="off">
+  <div class="row"><button id="dlgNomeNo">Annulla</button><button id="dlgNomeOk" class="ok">Salva</button></div>
+</div></div>
+
+<div class="ov" id="dlgConf"><div>
+  <p id="dlgConfT"></p><small id="dlgConfS"></small>
+  <div class="row"><button id="dlgConfNo">No</button><button id="dlgConfOk" class="yes">Sì, elimina</button></div>
+</div></div>
+
+<div id="toast"></div>
+<script>
+const KEY='incassi-fogli';
+const $=id=>document.getElementById(id);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const eur=n=>'€ '+n.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
+const dIt=s=>{const[y,m,d]=s.split('-');return d+'/'+m+'/'+y};
+const MESI=['GENNAIO','FEBBRAIO','MARZO','APRILE','MAGGIO','GIUGNO','LUGLIO','AGOSTO','SETTEMBRE','OTTOBRE','NOVEMBRE','DICEMBRE'];
+
+let st=null;
+try{st=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!st||!Array.isArray(st.fogli)||!st.fogli.length){
+  let vecchie=[];try{vecchie=JSON.parse(localStorage.getItem('incassi-righe'))||[]}catch(e){}
+  const f={id:uid(),nome:MESI[new Date().getMonth()],rows:vecchie};
+  st={fogli:[f],cur:f.id};
+}
+if(!st.titolo)st.titolo='NANNI GYM';
+function mostraTitolo(){$('titoloT').textContent=st.titolo;document.title=st.titolo}
+$('titolo').onclick=()=>chiediNome('Nome dell\'app',st.titolo,v=>{st.titolo=v;save();mostraTitolo()});
+const cur=()=>st.fogli.find(f=>f.id===st.cur)||st.fogli[0];
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+const somma=rows=>rows.reduce((a,r)=>a+Math.round(r.imp*100),0)/100;
+
+function render(){
+  const f=cur();st.cur=f.id;
+  $('foglio').innerHTML=st.fogli.map(x=>'<option value="'+x.id+'"'+(x.id===f.id?' selected':'')+'></option>').join('');
+  [...$('foglio').options].forEach((o,i)=>o.textContent=st.fogli[i].nome);
+  $('tot').textContent=eur(somma(f.rows));
+  $('cnt').textContent=f.rows.length?(f.rows.length===1?'1 pagamento':f.rows.length+' pagamenti'):'Nessun pagamento';
+  const ul=$('list');ul.innerHTML='';
+  if(!f.rows.length){ul.innerHTML='<li class="empty">Inserisci il primo pagamento qui sotto</li>';return}
+  f.rows.forEach((r,i)=>{
+    const li=document.createElement('li');
+    li.innerHTML='<div class="info"><div class="nm"></div><div class="dt">Scadenza '+dIt(r.data)+'</div></div><div class="eur">'+eur(r.imp)+'</div><button aria-label="Elimina">✕</button>';
+    li.querySelector('.nm').textContent=r.nome;
+    li.querySelector('button').onclick=()=>{f.rows.splice(i,1);save();render()};
+    ul.appendChild(li);
+  });
+  ul.lastChild.scrollIntoView({block:'nearest'});
+}
+function parse(t){
+  t=t.replace(/[€\s]/g,'');
+  if(!t)return NaN;
+  if(t.includes(','))t=t.replace(/\./g,'').replace(',','.');
+  return Number(t);
+}
+$('f').onsubmit=e=>{
+  e.preventDefault();
+  const nome=$('nome').value.trim(),data=$('data').value,imp=parse($('imp').value);
+  $('nome').classList.toggle('err',!nome);
+  $('data').classList.toggle('err',!data);
+  $('imp').classList.toggle('err',isNaN(imp));
+  if(!nome||!data||isNaN(imp))return;
+  cur().rows.push({nome,data,imp});save();render();
+  $('nome').value='';$('imp').value='';$('nome').focus();
+};
+['nome','data','imp'].forEach(id=>$(id).addEventListener('input',()=>$(id).classList.remove('err')));
+$('foglio').onchange=e=>{st.cur=e.target.value;save();render()};
+
+// dialog nome
+let onNome=null;
+function chiediNome(titolo,val,cb){$('dlgNomeT').textContent=titolo;$('dlgNomeIn').value=val;onNome=cb;$('dlgNome').classList.add('on');setTimeout(()=>$('dlgNomeIn').focus(),50)}
+$('dlgNomeNo').onclick=()=>$('dlgNome').classList.remove('on');
+$('dlgNomeOk').onclick=()=>{const v=$('dlgNomeIn').value.trim();if(!v){$('dlgNomeIn').classList.add('err');return}$('dlgNomeIn').classList.remove('err');$('dlgNome').classList.remove('on');onNome(v)};
+$('dlgNomeIn').onkeydown=e=>{if(e.key==='Enter')$('dlgNomeOk').click()};
+$('nuovo').onclick=()=>chiediNome('Nuovo foglio','',v=>{const f={id:uid(),nome:v,rows:[]};st.fogli.push(f);st.cur=f.id;save();render()});
+$('rin').onclick=()=>chiediNome('Rinomina foglio',cur().nome,v=>{cur().nome=v;save();render()});
+
+// dialog conferma
+let onConf=null;
+function conferma(t,s,cb){$('dlgConfT').textContent=t;$('dlgConfS').textContent=s;onConf=cb;$('dlgConf').classList.add('on')}
+$('dlgConfNo').onclick=()=>$('dlgConf').classList.remove('on');
+$('dlgConfOk').onclick=()=>{$('dlgConf').classList.remove('on');onConf()};
+$('svuota').onclick=()=>{const f=cur();if(!f.rows.length)return;conferma('Svuotare "'+f.nome+'"?','Cancella tutti i pagamenti di questo foglio. Il foglio resta.',()=>{f.rows=[];save();render()})};
+$('delf').onclick=()=>{const f=cur();conferma('Eliminare il foglio "'+f.nome+'"?','Cancella il foglio e tutti i suoi pagamenti.',()=>{
+  st.fogli=st.fogli.filter(x=>x.id!==f.id);
+  if(!st.fogli.length)st.fogli.push({id:uid(),nome:MESI[new Date().getMonth()],rows:[]});
+  st.cur=st.fogli[st.fogli.length-1].id;save();render();toast('Foglio eliminato')})};
+
+$('guidaBtn').onclick=()=>{const on=$('guida').classList.toggle('on');$('guidaBtn').classList.toggle('on',on);$('guidaBtn').textContent=on?'ⓘ Chiudi ▴':'ⓘ Come eliminare ▾'};
+$('elTutto').onclick=()=>conferma('Eliminare tutto?','Cancella tutti i fogli e i pagamenti da questo telefono. Non si può annullare.',()=>{
+  try{localStorage.removeItem(KEY);localStorage.removeItem('incassi-righe')}catch(e){}
+  const f={id:uid(),nome:MESI[new Date().getMonth()],rows:[]};
+  st={fogli:[f],cur:f.id,titolo:'NANNI GYM'};
+  mostraTitolo();vista('F');$('guidaBtn').click();toast('Tutto eliminato')});
+function toast(t){const el=$('toast');el.textContent=t;el.classList.add('on');setTimeout(()=>el.classList.remove('on'),1600)}
+$('copy').onclick=async()=>{
+  const f=cur();if(!f.rows.length)return;
+  const txt=f.nome+'\n\n'+f.rows.map(r=>r.nome+' — scad. '+dIt(r.data)+' — '+eur(r.imp)).join('\n')+'\n\nTOTALE: '+eur(somma(f.rows));
+  try{await navigator.clipboard.writeText(txt);toast('Elenco copiato')}catch(e){toast('Copia non riuscita')}
+};
+function esc(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}
+function renderArch(){
+  const tutti=st.fogli.reduce((a,f)=>a+somma(f.rows),0);
+  const n=st.fogli.reduce((a,f)=>a+f.rows.length,0);
+  let h='<div class="gt"><div class="lbl" style="margin:0">Totale di tutti i fogli</div><div class="v">'+eur(tutti)+'</div><div id="cnt">'+n+(n===1?' pagamento':' pagamenti')+' in '+st.fogli.length+(st.fogli.length===1?' foglio':' fogli')+'</div></div>';
+  st.fogli.forEach(f=>{
+    h+='<div class="sec"><h3>'+esc(f.nome)+'<span>'+eur(somma(f.rows))+'</span></h3><ul>';
+    if(!f.rows.length)h+='<li class="empty" style="padding:14px 0">Nessun pagamento</li>';
+    f.rows.forEach(r=>{h+='<li><div class="info"><div class="nm">'+esc(r.nome)+'</div><div class="dt">Scadenza '+dIt(r.data)+'</div></div><div class="eur">'+eur(r.imp)+'</div></li>'});
+    h+='</ul><button class="apri" data-id="'+f.id+'">Apri e modifica ›</button></div>';
+  });
+  $('arch').innerHTML=h;
+  $('arch').querySelectorAll('.apri').forEach(b=>b.onclick=()=>{st.cur=b.dataset.id;save();vista('F')});
+}
+function vista(v){document.body.classList.toggle('ar',v==='A');$('tA').classList.toggle('on',v==='A');$('tF').classList.toggle('on',v==='F');if(v==='A')renderArch();else render()}
+$('tF').onclick=()=>vista('F');$('tA').onclick=()=>vista('A');
+mostraTitolo();render();
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
